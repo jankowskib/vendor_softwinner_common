@@ -33,31 +33,8 @@ OPTIONS
     -B [boot_type]      Boot type, e.g. nand, sdcard, ...
     -d [debug_mode]     Debug modes, e.g. uart0(default), card0
     -s [sig_mode]       Sig modes, e.g. none(default), sig
-
-All available chips, platfroms, boards are list below
-
-CHIP  PLATFORM   BOARD
---------------------------------
 "
 
-for chipp in $(find chips/ -mindepth 1 -maxdepth 1 -type d )
-do
-    chip=`basename $chipp`
-    printf "$chip\n"
-
-    for platformp in $(find chips/$chip/configs/ -mindepth 1 -maxdepth 1 -type d)
-    do
-        platform=`basename $platformp`
-        printf "      $platform\n"
-
-        for boardp in $(find chips/$chip/configs/$platform/ -mindepth 1 -maxdepth 1 -type d)
-        do
-            board=`basename $boardp`
-            printf "                $board\n"
-        done
-    done
-
-done
 }
 
 while getopts hc:p:b:B:d:f:s:m: OPTION
@@ -124,11 +101,15 @@ do_pack_crane()
         exit 1
     fi
 	
-	if [ ! -f "$LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/sys_config.fex" ]; then
+	if [ ! -f "$LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/sys_config.fex" -o \
+		 ! -f "$LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/sys_partition.fex" ]; then
 		echo "please put sys_config into in your device tree configs directory"
 		exit 1
 	fi
 	
+	cp chips/sun6i/configs/android/default/*.fex out/ 
+    cp chips/sun6i/configs/android/default/*.cfg out/
+    
     cp $LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/*.fex out/ 
     cp $LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/*.cfg out/
 
@@ -160,6 +141,7 @@ do_pack_crane()
 
     #overlay bootlogo file
     if [ -e "$LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/bootlogo.bmp" ]; then
+    echo "Overlaying default bootlogo"
 	cp $LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/bootlogo.bmp out/boot-resource/
     fi
 
@@ -171,9 +153,14 @@ do_pack_crane()
     cp chips/$PACK_CHIP/bin/boot0_sdcard_$PACK_CHIP.bin out/boot0_sdcard.fex
 
     cp chips/$PACK_CHIP/bin/fes1_$PACK_CHIP.bin 	       out/fes1.fex
-
+    #overlay uboot
+    if [ -e "$LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/u-boot.fex" ]; then
+    echo "Overlaying default uboot"
+	cp $LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/u-boot.fex out/u-boot.fex
+    else
 	cp chips/$PACK_CHIP/bin/u-boot-$PACK_CHIP.bin 	   out/u-boot.fex
-
+	fi
+	
     cd out/
 
 

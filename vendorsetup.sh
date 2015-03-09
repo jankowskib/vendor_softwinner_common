@@ -19,7 +19,7 @@
 function pack()
 {
 	echo "Packing image..."
-	if [ "$(get_build_var PRODUCT_MANUFACTURER)" = "softwinner" ]; then	
+	if [ "$(get_build_var TARGET_BOARD_PLATFORM)" = "fiber" ]; then	
 	
 	if [ "$1" = "-d" -o "$2" = "-d" ]; then
 		echo "Redirecting UART to SD MMC slot"
