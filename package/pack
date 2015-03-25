@@ -75,10 +75,10 @@ do_prepare()
 
 #FIXME: do some basic check
 
-    if [ -d out ]; then
-        rm -rf out/
-    fi
-    mkdir out/
+    #if [ -d out ]; then
+    #    rm -rf out/
+    #fi
+    #mkdir out/
 }
 
 do_clean()
@@ -100,18 +100,6 @@ do_pack_crane()
         echo "please specify CRANE_IMAGE_OUT env"
         exit 1
     fi
-	
-	if [ ! -f "$LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/sys_config.fex" -o \
-		 ! -f "$LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/sys_partition.fex" ]; then
-		echo "please put sys_config into in your device tree configs directory"
-		exit 1
-	fi
-	
-	cp chips/sun6i/configs/android/default/*.fex out/ 
-    cp chips/sun6i/configs/android/default/*.cfg out/
-    
-    cp $LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/*.fex out/ 
-    cp $LICHEE_OUT/device/softwinner/$PACK_BOARD/configs/*.cfg out/
 
 	if [ $PACK_DEBUG = card0 ]; then
 	    cp $TOOLS_DIR/awk_debug_card0 out/awk_debug_card0
@@ -188,8 +176,8 @@ do_pack_crane()
 
 	busybox unix2dos sys_config.fex
 	busybox unix2dos sys_partition.fex
-	script sys_config.fex
-	script sys_partition.fex
+	script sys_config.fex || { echo "failed to parse sys_config.fex!"; exit 1;}
+	script sys_partition.fex || { echo "failed to parse sys_partition.fex!"; exit 1;}
 
 	cp sys_config.bin  config.fex
 
