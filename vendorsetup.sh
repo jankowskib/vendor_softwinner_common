@@ -22,27 +22,4 @@ function pack()
 	PACK_PLATFORM="$(get_build_var TARGET_BOARD_PLATFORM)"
 	PACK_TOP="$(gettop)"
 	$PACK_TOP/vendor/softwinner/common/pack.rb "--top" "$PACK_TOP" "--target" "$PACK_DEVICE" "--platform" "$PACK_PLATFORM" "$@"
-	#echo "Packing image..."
-	#if [ "$(get_build_var TARGET_BOARD_PLATFORM)" = "fiber" ]; then	
-	
-	#if [ "$1" = "-d" -o "$2" = "-d" ]; then
-		#echo "Redirecting UART to SD MMC slot"
-		#DEBUG="card0";
-	#else 
-		#DEBUG="uart0"
-	#fi
-	
-	#if [ "$1" = "-s" -o "$2" = "-s" ]; then
-		#echo "Appling signature to the image"
-		#SIGMODE="sig";
-	#else 
-		#SIGMODE="none"
-	#fi
-	#croot
-	#cd vendor/softwinner/common/package
-	#CRANE_IMAGE_OUT=$OUT LICHEE_OUT=$(gettop) ./pack -c sun6i -p android -b $(get_build_var TARGET_DEVICE) -d ${DEBUG} -s ${SIGMODE}
-	#croot
-	#else
-			#echo "Only usable on Allwinners!"
-	#fi
 }
