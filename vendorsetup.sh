@@ -21,5 +21,6 @@ function pack()
 	PACK_DEVICE="$(get_build_var TARGET_DEVICE)"
 	PACK_PLATFORM="$(get_build_var TARGET_BOARD_PLATFORM)"
 	PACK_TOP="$(gettop)"
-	$PACK_TOP/vendor/softwinner/common/pack.rb "--top" "$PACK_TOP" "--target" "$PACK_DEVICE" "--platform" "$PACK_PLATFORM" "$@"
+	PACK_VARIANT="$(get_build_var TARGET_BUILD_VARIANT)"
+	$PACK_TOP/vendor/softwinner/common/pack.rb "--top" "$PACK_TOP" "--target" "$PACK_DEVICE" "--variant" "$PACK_VARIANT" "--platform" "$PACK_PLATFORM" "$@"
 }

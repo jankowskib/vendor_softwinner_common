@@ -18,6 +18,8 @@
 require 'optparse'
 require 'fileutils'
 
+PLATFORMS = {"fiber" => "sun6i", "polaris" => "sun8iw3p1"}
+
 $options = {}
 $options[:debug] = "uart0"
 $options[:sig] = "none"
@@ -29,15 +31,20 @@ begin
     opts.on("-d", "--debug", "Redirect console to SD card slot") { |t| $options[:debug] = "card0" }
     opts.on("-s", "--sig", "Protect image with signature") { |t| $options[:sig] = "sig" }
     opts.on("-p", "--pcb PCB", "Set used sys config pcb") { |t| $options[:pcb] = t }
+    opts.on("--variant VAR", "TARGET_BUILD_VARIANT") { |t| $options[:variant] = t }
     opts.on("--platform NAME", "TARGET_BOARD_PLATFORM") { |t| $options[:platform] = t }
     opts.on("--target NAME", "TARGET_DEVICE") { |t| $options[:target] = t }
     opts.on("--top DIR", "build root") { |t| $options[:top] = t }
   end.parse!
   
     raise "Missing parameters" unless $options[:top] && $options[:target] &&
-     $options[:platform]
-    raise "Only usable on Allwinners #{$options[:platform]} <> fiber" unless 
-	 $options[:platform] == "fiber" 
+     $options[:platform] && $options[:variant]
+    raise "One or more parameters are empty" if $options[:top].empty? || 
+     $options[:target].empty? || $options[:platform].empty? || $options[:variant].empty?
+    raise "Only usable on Allwinners #{$options[:platform]}" unless 
+	 PLATFORMS.has_key? $options[:platform] 
+    
+    cpu = PLATFORMS[$options[:platform]]
     
     PACKAGE_ROOT = "#{$options[:top]}/vendor/softwinner/common/package/"
     DEVICE_ROOT  = "#{$options[:top]}/device/softwinner/#{$options[:target]}/"
@@ -52,9 +59,9 @@ begin
 	FileUtils.rm_f(Dir.glob("#{PACKAGE_ROOT}out/*"))
 	
 	# Copy basic files
-	FileUtils.cp(Dir.glob("#{PACKAGE_ROOT}chips/sun6i/configs/android/default/*.fex"),
+	FileUtils.cp(Dir.glob("#{PACKAGE_ROOT}chips/#{cpu}/configs/android/default/*.fex"),
 	 "#{PACKAGE_ROOT}out")
-	FileUtils.cp(Dir.glob("#{PACKAGE_ROOT}chips/sun6i/configs/android/default/*.cfg"),
+	FileUtils.cp(Dir.glob("#{PACKAGE_ROOT}chips/#{cpu}/configs/android/default/*.cfg"),
 	 "#{PACKAGE_ROOT}out")
 	
     # Override default files
@@ -71,9 +78,16 @@ begin
 	end
 
 	puts "Packing image..."
+	name = "#{cpu}_android_#{$options[:target]}"
+	name << "_card0" if $options[:debug] == "card0"
+	name << "_sig" if $options[:sig] == "sig"
+	name << "_#{$options[:variant]}"
+	name << "_pcb_#{$options[:pcb]}" if $options[:pcb]
+	name << "-" << Time.now.strftime("%F")
+	name << ".img"
 	
 	cmd = "CRANE_IMAGE_OUT=#{$options[:top]}/out/target/product/#{$options[:target]}" <<
-	 " LICHEE_OUT=#{$options[:top]} ./pack -c sun6i -p android -b #{$options[:target]}" <<
-	 " -d #{$options[:debug]} -s #{$options[:sig]}"
+	 " LICHEE_OUT=#{$options[:top]} ./pack -c #{cpu} -p android -b #{$options[:target]}" <<
+	 " -d #{$options[:debug]} -s #{$options[:sig]} -i #{name}"
 	exec("cd #{$options[:top]}/vendor/softwinner/common/package && " << cmd)
 end
