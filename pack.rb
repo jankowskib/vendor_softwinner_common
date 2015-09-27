@@ -56,6 +56,7 @@ begin
 	end
 	
 	# Clean build dir
+	FileUtils.mkdir("#{PACKAGE_ROOT}out") unless File.exist? ("#{PACKAGE_ROOT}out")
 	FileUtils.rm_f(Dir.glob("#{PACKAGE_ROOT}out/*"))
 	
 	# Copy basic files
