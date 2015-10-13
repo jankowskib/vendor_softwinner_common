@@ -22,5 +22,14 @@ function pack()
 	PACK_PLATFORM="$(get_build_var TARGET_BOARD_PLATFORM)"
 	PACK_TOP="$(gettop)"
 	PACK_VARIANT="$(get_build_var TARGET_BUILD_VARIANT)"
-	$PACK_TOP/vendor/softwinner/common/pack.rb "--top" "$PACK_TOP" "--target" "$PACK_DEVICE" "--variant" "$PACK_VARIANT" "--platform" "$PACK_PLATFORM" "$@"
+	$PACK_TOP/vendor/softwinner/common/pack.rb "--action" "pack" "--top" "$PACK_TOP" "--target" "$PACK_DEVICE" "--variant" "$PACK_VARIANT" "--platform" "$PACK_PLATFORM" "$@"
+}
+
+function update_uboot()
+{
+	PACK_DEVICE="$(get_build_var TARGET_DEVICE)"
+	PACK_PLATFORM="$(get_build_var TARGET_BOARD_PLATFORM)"
+	PACK_TOP="$(gettop)"
+	PACK_VARIANT="$(get_build_var TARGET_BUILD_VARIANT)"
+	$PACK_TOP/vendor/softwinner/common/pack.rb "--action" "update_uboot" "--top" "$PACK_TOP" "--target" "$PACK_DEVICE" "--variant" "$PACK_VARIANT" "--platform" "$PACK_PLATFORM" "$@"
 }
